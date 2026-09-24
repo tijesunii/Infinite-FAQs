@@ -1,0 +1,180 @@
+<?php
+/**
+ * Infinite FAQs for WordPress - Admin Settings Page
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly.
+}
+
+/**
+ * Register the admin menu page.
+ */
+function infinite_faqs_add_admin_menu() {
+    add_menu_page(
+        esc_html__( 'Infinite FAQs Settings', 'infinite-faqs' ),
+        esc_html__( 'Infinite FAQs', 'infinite-faqs' ),
+        'manage_options',
+        'infinite-faqs',
+        'infinite_faqs_settings_page_html',
+        'dashicons-testimonial',
+        80
+    );
+}
+add_action( 'admin_menu', 'infinite_faqs_add_admin_menu' );
+
+/**
+ * Encryption Helper Functions
+ * Implements OpenSSL encryption at rest for the API Key.
+ */
+function infinite_faqs_encrypt_data( $data ) {
+    if ( empty( $data ) ) return $data;
+    
+    // Use WordPress SECURE_AUTH_KEY if available
+    $encryption_key = defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : 'fallback-ifaq-key-789';
+    $iv_length = openssl_cipher_iv_length( 'aes-256-cbc' );
+    $iv = openssl_random_pseudo_bytes( $iv_length );
+    $encrypted = openssl_encrypt( $data, 'aes-256-cbc', $encryption_key, 0, $iv );
+    
+    return base64_encode( $encrypted . '::' . $iv );
+}
+
+function infinite_faqs_decrypt_data( $data ) {
+    if ( empty( $data ) ) return $data;
+    
+    $encryption_key = defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : 'fallback-ifaq-key-789';
+    $decoded = base64_decode( $data );
+    
+    if ( strpos( $decoded, '::' ) === false ) {
+        return $data; // Return original data if not encrypted with our method
+    }
+    
+    list( $encrypted_data, $iv ) = explode( '::', $decoded, 2 );
+    return openssl_decrypt( $encrypted_data, 'aes-256-cbc', $encryption_key, 0, $iv );
+}
+
+/**
+ * Mask API Key for server-side masking in the UI.
+ */
+function infinite_faqs_mask_api_key( $api_key ) {
+    if ( empty( $api_key ) ) return '';
+    $length = strlen( $api_key );
+    if ( $length <= 8 ) return str_repeat( '*', 8 );
+    // Show first 4 and last 4 characters, mask the middle
+    return substr( $api_key, 0, 4 ) . str_repeat( '*', 8 ) . substr( $api_key, -4 );
+}
+
+/**
+ * Render the Settings Page HTML
+ */
+function infinite_faqs_settings_page_html() {
+    // Capability check
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    // Process form submission
+    if ( isset( $_POST['infinite_faqs_submit'] ) ) {
+        // Verify nonce
+        if ( ! isset( $_POST['infinite_faqs_settings_nonce'] ) || ! wp_verify_nonce( $_POST['infinite_faqs_settings_nonce'], 'infinite_faqs_save_settings' ) ) {
+            wp_die( esc_html__( 'Security check failed.', 'infinite-faqs' ) );
+        }
+
+        // Save AI Provider
+        if ( isset( $_POST['infinite_faqs_ai_provider'] ) ) {
+            update_option( 'infinite_faqs_ai_provider', sanitize_text_field( $_POST['infinite_faqs_ai_provider'] ) );
+        }
+
+        // Save API Key (only if it doesn't contain asterisks, indicating it is a new key)
+        if ( ! empty( $_POST['infinite_faqs_api_key'] ) && strpos( $_POST['infinite_faqs_api_key'], '*' ) === false ) {
+            $sanitized_key = sanitize_text_field( wp_unslash( $_POST['infinite_faqs_api_key'] ) );
+            $encrypted_key = infinite_faqs_encrypt_data( $sanitized_key );
+            update_option( 'infinite_faqs_api_key', $encrypted_key );
+        }
+
+        // Save Support URL
+        if ( isset( $_POST['infinite_faqs_support_url'] ) ) {
+            update_option( 'infinite_faqs_support_url', sanitize_url( wp_unslash( $_POST['infinite_faqs_support_url'] ) ) );
+        }
+
+        // Save Answer Length
+        if ( isset( $_POST['infinite_faqs_answer_length'] ) ) {
+            update_option( 'infinite_faqs_answer_length', sanitize_text_field( $_POST['infinite_faqs_answer_length'] ) );
+        }
+
+        // Save Keep Data preference
+        $keep_data = isset( $_POST['infinite_faqs_keep_data_on_uninstall'] ) ? '1' : '0';
+        update_option( 'infinite_faqs_keep_data_on_uninstall', $keep_data );
+
+        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved securely.', 'infinite-faqs' ) . '</p></div>';
+    }
+
+    // Retrieve current settings
+    $current_provider = get_option( 'infinite_faqs_ai_provider', 'openai' );
+    $answer_length    = get_option( 'infinite_faqs_answer_length', 'Brief' );
+    $encrypted_key    = get_option( 'infinite_faqs_api_key', '' );
+    $decrypted_key    = infinite_faqs_decrypt_data( $encrypted_key );
+    $masked_key       = infinite_faqs_mask_api_key( $decrypted_key );
+    $support_url      = get_option( 'infinite_faqs_support_url', '' );
+    $keep_data        = get_option( 'infinite_faqs_keep_data_on_uninstall', '0' );
+
+    ?>
+    <div class="wrap">
+        <h1><?php esc_html_e( 'Infinite FAQs Settings', 'infinite-faqs' ); ?></h1>
+        <form method="post" action="">
+            <?php wp_nonce_field( 'infinite_faqs_save_settings', 'infinite_faqs_settings_nonce' ); ?>
+            
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="infinite_faqs_ai_provider"><?php esc_html_e( 'AI Provider', 'infinite-faqs' ); ?></label></th>
+                    <td>
+                        <select name="infinite_faqs_ai_provider" id="infinite_faqs_ai_provider">
+                            <option value="openai" <?php selected( $current_provider, 'openai' ); ?>>OpenAI</option>
+                            <option value="anthropic" <?php selected( $current_provider, 'anthropic' ); ?>>Anthropic</option>
+                            <option value="gemini" <?php selected( $current_provider, 'gemini' ); ?>>Gemini</option>
+                            <option value="deepseek" <?php selected( $current_provider, 'deepseek' ); ?>>DeepSeek</option>
+                        </select>
+                        <p class="description"><?php esc_html_e( 'Select the AI provider you wish to use for generating answers.', 'infinite-faqs' ); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="infinite_faqs_answer_length"><?php esc_html_e( 'Answer Length', 'infinite-faqs' ); ?></label></th>
+                    <td>
+                        <select name="infinite_faqs_answer_length" id="infinite_faqs_answer_length">
+                            <option value="Brief" <?php selected( $answer_length, 'Brief' ); ?>>Brief (Concise)</option>
+                            <option value="Standard" <?php selected( $answer_length, 'Standard' ); ?>>Standard (Detailed)</option>
+                        </select>
+                        <p class="description"><?php esc_html_e( 'Select your preferred verbosity for generated answers.', 'infinite-faqs' ); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="infinite_faqs_api_key"><?php esc_html_e( 'API Key', 'infinite-faqs' ); ?></label></th>
+                    <td>
+                        <input type="password" name="infinite_faqs_api_key" id="infinite_faqs_api_key" value="<?php echo esc_attr( $masked_key ); ?>" class="regular-text" autocomplete="off" />
+                        <p class="description"><?php esc_html_e( 'Your API Key is stored securely. To update, simply enter a new key.', 'infinite-faqs' ); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="infinite_faqs_support_url"><?php esc_html_e( 'Contact Support URL', 'infinite-faqs' ); ?></label></th>
+                    <td>
+                        <input type="url" name="infinite_faqs_support_url" id="infinite_faqs_support_url" value="<?php echo esc_url( $support_url ); ?>" class="regular-text" />
+                        <p class="description"><?php esc_html_e( 'The fallback URL users are directed to if the AI cannot find an answer in your documentation.', 'infinite-faqs' ); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Data Retention', 'infinite-faqs' ); ?></th>
+                    <td>
+                        <label for="infinite_faqs_keep_data_on_uninstall">
+                            <input type="checkbox" name="infinite_faqs_keep_data_on_uninstall" id="infinite_faqs_keep_data_on_uninstall" value="1" <?php checked( $keep_data, '1' ); ?> />
+                            <?php esc_html_e( 'Keep data on uninstall', 'infinite-faqs' ); ?>
+                        </label>
+                        <p class="description"><?php esc_html_e( 'If checked, your custom knowledge base tables and settings will NOT be deleted when you uninstall the plugin.', 'infinite-faqs' ); ?></p>
+                    </td>
+                </tr>
+            </table>
+            
+            <?php submit_button( esc_html__( 'Save Settings', 'infinite-faqs' ), 'primary', 'infinite_faqs_submit' ); ?>
+        </form>
+    </div>
+    <?php
+}
