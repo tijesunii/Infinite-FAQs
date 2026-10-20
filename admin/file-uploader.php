@@ -84,7 +84,7 @@ function infinite_faqs_generate_keywords( $chunk_text ) {
                 'Content-Type'  => 'application/json',
             ),
             'body' => wp_json_encode( array(
-                'model' => 'gpt-4o-mini',
+                'model' => 'gpt-5-mini',
                 'messages' => array(
                     array( 'role' => 'user', 'content' => $prompt )
                 )
@@ -106,7 +106,7 @@ function infinite_faqs_generate_keywords( $chunk_text ) {
                 'Content-Type'      => 'application/json',
             ),
             'body' => wp_json_encode( array(
-                'model'      => 'claude-3-haiku-20240307',
+                'model'      => 'claude-haiku-4-5',
                 'max_tokens' => 100,
                 'messages'   => array(
                     array( 'role' => 'user', 'content' => $prompt )
@@ -122,7 +122,7 @@ function infinite_faqs_generate_keywords( $chunk_text ) {
         }
     } elseif ( $provider === 'gemini' ) {
         // phpcs:ignore PluginCheck.CodeAnalysis.AIProvider.DirectIntegration
-        $response = wp_remote_post( 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $api_key, array(
+        $response = wp_remote_post( 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . $api_key, array(
             'headers' => array( 'Content-Type' => 'application/json' ),
             'body' => wp_json_encode( array(
                 'contents' => array(
@@ -145,7 +145,7 @@ function infinite_faqs_generate_keywords( $chunk_text ) {
                 'Content-Type'  => 'application/json',
             ),
             'body' => wp_json_encode( array(
-                'model' => 'deepseek-chat',
+                'model' => 'deepseek-flash',
                 'messages' => array(
                     array( 'role' => 'user', 'content' => $prompt )
                 )
@@ -349,7 +349,7 @@ function infinite_faqs_generate_faqs_from_doc( $selected_file ) {
                 'Content-Type'  => 'application/json',
             ),
             'body'    => wp_json_encode( array(
-                'model'    => 'gpt-4o-mini',
+                'model'    => 'gpt-5-mini',
                 'messages' => array(
                     array( 'role' => 'user', 'content' => $prompt ),
                 ),
@@ -373,7 +373,7 @@ function infinite_faqs_generate_faqs_from_doc( $selected_file ) {
                 'Content-Type'      => 'application/json',
             ),
             'body'    => wp_json_encode( array(
-                'model'      => 'claude-3-haiku-20240307',
+                'model'      => 'claude-haiku-4-5',
                 'max_tokens' => 800,
                 'messages'   => array(
                     array( 'role' => 'user', 'content' => $prompt ),
@@ -391,7 +391,7 @@ function infinite_faqs_generate_faqs_from_doc( $selected_file ) {
         }
     } elseif ( 'gemini' === $provider ) {
         // phpcs:ignore PluginCheck.CodeAnalysis.AIProvider.DirectIntegration
-        $response = wp_remote_post( 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $api_key, array(
+        $response = wp_remote_post( 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . $api_key, array(
             'headers' => array( 'Content-Type' => 'application/json' ),
             'body'    => wp_json_encode( array(
                 'contents' => array(
@@ -419,7 +419,7 @@ function infinite_faqs_generate_faqs_from_doc( $selected_file ) {
                 'Content-Type'  => 'application/json',
             ),
             'body'    => wp_json_encode( array(
-                'model'    => 'deepseek-chat',
+                'model'    => 'deepseek-flash',
                 'messages' => array(
                     array( 'role' => 'user', 'content' => $prompt ),
                 ),

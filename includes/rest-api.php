@@ -204,7 +204,7 @@ function infinite_faqs_process_question( WP_REST_Request $request ) {
                 'Content-Type'  => 'application/json',
             ),
             'body' => wp_json_encode( array(
-                'model' => 'gpt-4o-mini',
+                'model' => 'gpt-5-mini',
                 'messages' => array(
                     array( 'role' => 'system', 'content' => $system_prompt ),
                     array( 'role' => 'user', 'content' => $user_prompt )
@@ -227,7 +227,7 @@ function infinite_faqs_process_question( WP_REST_Request $request ) {
                 'Content-Type'      => 'application/json',
             ),
             'body' => wp_json_encode( array(
-                'model'      => 'claude-3-haiku-20240307',
+                'model'      => 'claude-haiku-4-5',
                 'max_tokens' => 300,
                 'system'     => $system_prompt,
                 'messages'   => array(
@@ -244,7 +244,7 @@ function infinite_faqs_process_question( WP_REST_Request $request ) {
         }
     } elseif ( $provider === 'gemini' ) {
         // phpcs:ignore PluginCheck.CodeAnalysis.AIProvider.DirectIntegration
-        $response = wp_remote_post( 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $api_key, array(
+        $response = wp_remote_post( 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . $api_key, array(
             'headers' => array( 'Content-Type' => 'application/json' ),
             'body' => wp_json_encode( array(
                 'systemInstruction' => array( 'parts' => array( array( 'text' => $system_prompt ) ) ),
@@ -268,7 +268,7 @@ function infinite_faqs_process_question( WP_REST_Request $request ) {
                 'Content-Type'  => 'application/json',
             ),
             'body' => wp_json_encode( array(
-                'model' => 'deepseek-chat',
+                'model' => 'deepseek-flash',
                 'messages' => array(
                     array( 'role' => 'system', 'content' => $system_prompt ),
                     array( 'role' => 'user', 'content' => $user_prompt )

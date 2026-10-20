@@ -18,7 +18,7 @@ Instead of relying on third-party SaaS subscriptions or vector databases, Infini
 
 = Key Features =
 
-* **Bring Your Own Key (BYOK):** Supports OpenAI (`gpt-4o-mini`), Anthropic (`claude-3-haiku`), Google Gemini (`gemini-1.5-flash`), and DeepSeek (`deepseek-chat`) with AES-256-CBC key encryption at rest.
+* **Bring Your Own Key (BYOK):** Supports OpenAI (`gpt-5-mini`), Anthropic (`claude-haiku-4-5`), Google Gemini (`gemini-2.5-flash`), and DeepSeek (`deepseek-flash`) with AES-256-CBC key encryption at rest.
 * **Zero-Hallucination Grounding:** Answers are strictly generated from your uploaded Markdown documentation chunks with automatic deep-link citations (`#anchor`).
 * **Smart Fallback to Support:** If an answer is not found in your documentation, users are gracefully directed to your support URL without wasting tokens.
 * **Predefined 4-Card Accordion + AI Auto-Generator:** Manually write your top 4 FAQs or generate them in one click from any indexed `.md` document using AI.
@@ -36,26 +36,26 @@ When configured, data is sent to the selected AI provider under three specific c
 = Supported Third-Party AI Providers =
 
 * **OpenAI API** (`https://api.openai.com/v1/chat/completions`)
-  * Service Website: [https://openai.com/api/](https://openai.com/api/)
-  * Terms of Use: [https://openai.com/policies/terms-of-use/](https://openai.com/policies/terms-of-use/)
-  * Privacy Policy: [https://openai.com/policies/privacy-policy/](https://openai.com/policies/privacy-policy/)
+  * Service Website: https://openai.com/api/
+  * Terms of Use: https://openai.com/policies/terms-of-use/
+  * Privacy Policy: https://openai.com/policies/privacy-policy/
 * **Anthropic Claude API** (`https://api.anthropic.com/v1/messages`)
-  * Service Website: [https://www.anthropic.com/api](https://www.anthropic.com/api)
-  * Terms of Service: [https://www.anthropic.com/legal/commercial-terms](https://www.anthropic.com/legal/commercial-terms)
-  * Privacy Policy: [https://www.anthropic.com/legal/privacy](https://www.anthropic.com/legal/privacy)
-* **Google Gemini API** (`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`)
-  * Service Website: [https://ai.google.dev/](https://ai.google.dev/)
-  * Terms of Service: [https://ai.google.dev/gemini-api/terms](https://ai.google.dev/gemini-api/terms)
-  * Privacy Policy: [https://policies.google.com/privacy](https://policies.google.com/privacy)
+  * Service Website: https://www.anthropic.com/api
+  * Terms of Service: https://www.anthropic.com/legal/commercial-terms
+  * Privacy Policy: https://www.anthropic.com/legal/privacy
+* **Google Gemini API** (`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`)
+  * Service Website: https://ai.google.dev/
+  * Terms of Service: https://ai.google.dev/gemini-api/terms
+  * Privacy Policy: https://policies.google.com/privacy
 * **DeepSeek API** (`https://api.deepseek.com/chat/completions`)
-  * Service Website: [https://platform.deepseek.com/](https://platform.deepseek.com/)
-  * Terms of Service: [https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html](https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html)
-  * Privacy Policy: [https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html](https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html)
+  * Service Website: https://platform.deepseek.com/
+  * Terms of Service: https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html
+  * Privacy Policy: https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html
 
 == Third-Party Libraries & Source Code ==
 
-* **Parsedown** (`v1.8.0` by Emanuil Rusev, bundled in `lib/Parsedown.php` and prefixed as `Infinite_FAQs_Parsedown`): Licensed under the MIT License (GPL-compatible). Source repository: [https://github.com/erusev/parsedown](https://github.com/erusev/parsedown)
-* **Plugin Source Code:** All JavaScript (`assets/js/infinite-faqs.js`) and CSS (`assets/css/infinite-faqs.css`) are shipped in unminified, human-readable form. Public development repository: [https://github.com/tijesunii/Infinite-FAQs](https://github.com/tijesunii/Infinite-FAQs)
+* **Parsedown** (`v1.8.0` by Emanuil Rusev, bundled in `lib/Parsedown.php` and prefixed as `Infinite_FAQs_Parsedown`): Licensed under the MIT License (GPL-compatible). Source repository: https://github.com/erusev/parsedown
+* **Plugin Source Code:** All JavaScript (`assets/js/infinite-faqs.js`) and CSS (`assets/css/infinite-faqs.css`) are shipped in unminified, human-readable form. Public development repository: https://github.com/tijesunii/Infinite-FAQs
 
 == Installation ==
 
@@ -68,7 +68,7 @@ When configured, data is sent to the selected AI provider under three specific c
 == Frequently Asked Questions ==
 
 = Which AI providers are supported? =
-Infinite FAQs supports OpenAI, Anthropic (Claude), Google Gemini, and DeepSeek.
+Infinite FAQs supports OpenAI (`gpt-5-mini`), Anthropic (`claude-haiku-4-5`), Google Gemini (`gemini-2.5-flash`), and DeepSeek (`deepseek-flash`).
 
 = Does this plugin require jQuery? =
 No. The frontend widget is built with 100% Vanilla JavaScript and scoped CSS variables for fast page loads and full compatibility with Gutenberg and Elementor.
