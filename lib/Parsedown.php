@@ -14,7 +14,7 @@
 #
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly.
+    exit;
 }
 
 class Infinite_FAQs_Parsedown

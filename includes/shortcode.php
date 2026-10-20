@@ -1,17 +1,12 @@
 <?php
 /**
- * Infinite FAQs for WordPress - Shortcode & HTML Skeleton
- *
- * Registers [infinite_faqs] (light mode default), [infinite_faqs_light], and [infinite_faqs_dark].
+ * Infinite FAQs - Shortcode Renderer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
-/**
- * Register the plugin shortcodes and frontend assets.
- */
 function infinite_faqs_register_shortcodes() {
 	add_shortcode( 'infinite_faqs', 'infinite_faqs_render_shortcode' );
 	add_shortcode( 'infinite_faqs_light', 'infinite_faqs_render_light_shortcode' );
@@ -19,11 +14,6 @@ function infinite_faqs_register_shortcodes() {
 }
 add_action( 'init', 'infinite_faqs_register_shortcodes' );
 
-/**
- * Register (but do not yet load) frontend CSS and Vanilla JS assets.
- * Assets are only enqueued when the shortcode is actually rendered on a page
- * or inside the Elementor editor preview.
- */
 function infinite_faqs_register_frontend_assets() {
 	wp_register_style(
 		'infinite-faqs-style',
@@ -35,18 +25,15 @@ function infinite_faqs_register_frontend_assets() {
 	wp_register_script(
 		'infinite-faqs-script',
 		INFINITE_FAQS_PLUGIN_URL . 'assets/js/infinite-faqs.js',
-		array(), // Strictly Vanilla JS (zero jQuery dependency)
+		array(),
 		INFINITE_FAQS_VERSION,
-		true     // Load in footer
+		true
 	);
 }
 add_action( 'wp_enqueue_scripts', 'infinite_faqs_register_frontend_assets' );
 add_action( 'elementor/frontend/after_enqueue_styles', 'infinite_faqs_enqueue_frontend_assets' );
 add_action( 'elementor/preview/enqueue_styles', 'infinite_faqs_enqueue_frontend_assets' );
 
-/**
- * Build the frontend configuration array (used in both wp_localize_script and data attribute fallback).
- */
 function infinite_faqs_get_frontend_config() {
 	return array(
 		'restUrl'     => esc_url_raw( rest_url( 'infinite-faqs/v1/ask' ) ),
@@ -62,9 +49,6 @@ function infinite_faqs_get_frontend_config() {
 	);
 }
 
-/**
- * Enqueue frontend assets and pass the security handshake (Token + REST URL).
- */
 function infinite_faqs_enqueue_frontend_assets() {
 	if ( ! wp_style_is( 'infinite-faqs-style', 'registered' ) ) {
 		infinite_faqs_register_frontend_assets();
@@ -83,38 +67,19 @@ function infinite_faqs_enqueue_frontend_assets() {
 	}
 }
 
-/**
- * Render the Light Mode Shortcode explicitly: [infinite_faqs_light]
- *
- * @param array $atts Shortcode attributes.
- * @return string Rendered HTML.
- */
 function infinite_faqs_render_light_shortcode( $atts = array() ) {
-	$atts = is_array( $atts ) ? $atts : array();
+	$atts          = is_array( $atts ) ? $atts : array();
 	$atts['theme'] = 'light';
 	return infinite_faqs_render_shortcode( $atts );
 }
 
-/**
- * Render the Dark Mode Shortcode explicitly: [infinite_faqs_dark]
- *
- * @param array $atts Shortcode attributes.
- * @return string Rendered HTML.
- */
 function infinite_faqs_render_dark_shortcode( $atts = array() ) {
-	$atts = is_array( $atts ) ? $atts : array();
+	$atts          = is_array( $atts ) ? $atts : array();
 	$atts['theme'] = 'dark';
 	return infinite_faqs_render_shortcode( $atts );
 }
 
-/**
- * Core Shortcode Renderer: [infinite_faqs]
- *
- * @param array $atts Shortcode attributes.
- * @return string Rendered HTML.
- */
 function infinite_faqs_render_shortcode( $atts = array() ) {
-	// Conditionally enqueue CSS, Vanilla JS, and the localized security handshake
 	infinite_faqs_enqueue_frontend_assets();
 
 	$saved_heading = get_option( 'infinite_faqs_shortcode_heading', 'Questions' );
@@ -137,7 +102,6 @@ function infinite_faqs_render_shortcode( $atts = array() ) {
 		'infinite_faqs'
 	);
 
-	// Enforce max 9 characters on the rendered heading
 	$heading_text = mb_substr( trim( $atts['title'] ), 0, 9 );
 	if ( '' === $heading_text ) {
 		$heading_text = 'Questions';
@@ -147,7 +111,6 @@ function infinite_faqs_render_shortcode( $atts = array() ) {
 	$theme_class = 'infinite-faqs-theme-' . $theme_mode;
 	$config_json = wp_json_encode( infinite_faqs_get_frontend_config() );
 
-	// Load the 4 Predefined Static FAQs from wp_options
 	$static_faqs = get_option( 'infinite_faqs_static_faqs', array() );
 	if ( ! is_array( $static_faqs ) ) {
 		$static_faqs = array();
@@ -157,23 +120,19 @@ function infinite_faqs_render_shortcode( $atts = array() ) {
 	?>
 	<div class="infinite-faqs-wrapper <?php echo esc_attr( $theme_class ); ?>" data-theme="<?php echo esc_attr( $theme_mode ); ?>" data-config="<?php echo esc_attr( $config_json ); ?>">
 		<div class="infinite-faqs-container">
-			
-			<!-- Left Column: Header & Subtitle -->
 			<div class="infinite-faqs-left-col">
 				<h2 class="infinite-faqs-title"><?php echo esc_html( $heading_text ); ?></h2>
 				<p class="infinite-faqs-subtitle"><?php echo esc_html( $atts['subtitle'] ); ?></p>
 			</div>
 
-			<!-- Right Column: Static Accordion FAQs + Open-Ended AI Input -->
 			<div class="infinite-faqs-right-col">
-				
 				<div class="infinite-faqs-accordion-list">
 					<?php
 					foreach ( $static_faqs as $faq ) :
 						$q_text = isset( $faq['question'] ) ? trim( $faq['question'] ) : '';
 						$a_text = isset( $faq['answer'] ) ? trim( $faq['answer'] ) : '';
 						if ( '' === $q_text && '' === $a_text ) {
-							continue; // Skip blank card slots
+							continue;
 						}
 						?>
 						<div class="infinite-faqs-accordion-item">
@@ -195,25 +154,22 @@ function infinite_faqs_render_shortcode( $atts = array() ) {
 					<?php endforeach; ?>
 				</div>
 
-				<!-- Open-Ended AI Query Section (AC-3.2) -->
 				<div class="infinite-faqs-ask-section">
 					<form class="infinite-faqs-ask-form" novalidate>
-						
-						<!-- Layer 3 Security: Honeypot Trap (Hidden from real users) -->
-						<div class="infinite-faqs-hp-wrap" style="position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; overflow: hidden;" aria-hidden="true">
+						<div class="infinite-faqs-hp-wrap" aria-hidden="true">
 							<label for="ifaq_email_check_<?php echo esc_attr( $theme_mode ); ?>">Do not fill this field</label>
 							<input type="text" name="_ifaq_email_check" id="ifaq_email_check_<?php echo esc_attr( $theme_mode ); ?>" class="infinite-faqs-honeypot" value="" tabindex="-1" autocomplete="off" />
 						</div>
 
 						<div class="infinite-faqs-input-wrapper">
-							<input 
-								type="text" 
-								name="question" 
-								class="infinite-faqs-input" 
-								placeholder="<?php echo esc_attr__( 'Ask a question about our product...', 'infinite-faqs' ); ?>" 
+							<input
+								type="text"
+								name="question"
+								class="infinite-faqs-input"
+								placeholder="<?php echo esc_attr__( 'Ask a question about our product...', 'infinite-faqs' ); ?>"
 								aria-label="<?php echo esc_attr__( 'Ask a question about our product', 'infinite-faqs' ); ?>"
 								maxlength="250"
-								required 
+								required
 							/>
 							<button type="submit" class="infinite-faqs-submit-btn" aria-label="<?php echo esc_attr__( 'Submit question', 'infinite-faqs' ); ?>">
 								<span class="infinite-faqs-icon-container">
@@ -225,24 +181,20 @@ function infinite_faqs_render_shortcode( $atts = array() ) {
 						</div>
 					</form>
 
-					<!-- Loading State (AC-3.3) -->
-					<div class="infinite-faqs-loading" style="display: none;" aria-live="polite">
+					<div class="infinite-faqs-loading" aria-live="polite">
 						<span class="infinite-faqs-spinner"></span>
 						<span class="infinite-faqs-loading-text"><?php esc_html_e( 'Searching docs...', 'infinite-faqs' ); ?></span>
 					</div>
 
-					<!-- Dynamic AI Answer & Citation / Fallback Container (AC-5 & AC-6) -->
-					<div class="infinite-faqs-response-container" style="display: none;" aria-live="polite">
+					<div class="infinite-faqs-response-container" aria-live="polite">
 						<p class="infinite-faqs-ai-thought"></p>
 						<div class="infinite-faqs-answer-text"></div>
 						<div class="infinite-faqs-action-wrapper"></div>
 					</div>
 				</div>
-
-			</div><!-- .infinite-faqs-right-col -->
-
-		</div><!-- .infinite-faqs-container -->
-	</div><!-- .infinite-faqs-wrapper -->
+			</div>
+		</div>
+	</div>
 	<?php
 	return ob_get_clean();
 }

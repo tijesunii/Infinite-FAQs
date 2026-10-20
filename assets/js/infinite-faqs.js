@@ -1,20 +1,10 @@
 /**
- * Infinite FAQs for WordPress - Vanilla JS Frontend Controller
- *
- * Strictly Vanilla JavaScript (ES6+). Zero external dependencies.
- * Uses event delegation so shortcodes rendered dynamically via AJAX
- * (such as inside the Elementor live editor) work automatically.
+ * Infinite FAQs - Frontend Controller
  */
 
 (function () {
 	'use strict';
 
-	/**
-	 * Retrieve configuration from window.infiniteFaqsData or fallback to data-config attribute.
-	 *
-	 * @param {HTMLElement} wrapper The .infinite-faqs-wrapper element.
-	 * @return {Object|null}
-	 */
 	function getConfig(wrapper) {
 		if (typeof window.infiniteFaqsData !== 'undefined' && window.infiniteFaqsData.restUrl) {
 			return window.infiniteFaqsData;
@@ -29,10 +19,6 @@
 		return null;
 	}
 
-	/**
-	 * 1. Event Delegation for Static FAQ Accordions
-	 * Works immediately for static pages AND dynamically injected Elementor widgets.
-	 */
 	document.addEventListener('click', function (e) {
 		const button = e.target.closest('.infinite-faqs-accordion-header');
 		if (!button) {
@@ -48,7 +34,6 @@
 		const content = item.querySelector('.infinite-faqs-accordion-content');
 		const isActive = item.classList.contains('active');
 
-		// Collapse all other accordion items within this instance
 		wrapper.querySelectorAll('.infinite-faqs-accordion-item').forEach(function (otherItem) {
 			otherItem.classList.remove('active');
 			const otherBtn = otherItem.querySelector('.infinite-faqs-accordion-header');
@@ -61,7 +46,6 @@
 			}
 		});
 
-		// Expand clicked item if it wasn't already open
 		if (!isActive && content) {
 			item.classList.add('active');
 			button.setAttribute('aria-expanded', 'true');
@@ -69,9 +53,6 @@
 		}
 	});
 
-	/**
-	 * 2. Event Delegation for Open-Ended AI Query Form Submission
-	 */
 	document.addEventListener('submit', async function (e) {
 		const form = e.target.closest('.infinite-faqs-ask-form');
 		if (!form) {
@@ -103,7 +84,6 @@
 		const honeypotVal = honeypot ? honeypot.value : '';
 		const i18n = config.i18n || {};
 
-		// Validate non-empty / minimum length (PRD Section 9 & Layer 4 Security)
 		if (question.length < 5) {
 			renderResponse(
 				{
@@ -118,7 +98,6 @@
 			return;
 		}
 
-		// Enter Loading State (AC-3.3)
 		setLoadingState(true, { input, submitBtn, loadingEl, responseContainer });
 		const startTime = performance.now();
 
@@ -127,7 +106,6 @@
 				'Content-Type': 'application/json'
 			};
 
-			// Pass standard WP REST nonce header so logged-in sessions authenticate cleanly
 			if (config.wpRestNonce) {
 				headers['X-WP-Nonce'] = config.wpRestNonce;
 			}
@@ -148,7 +126,6 @@
 
 			setLoadingState(false, { input, submitBtn, loadingEl, responseContainer });
 
-			// Handle HTTP-level errors (400, 403, 429, 500)
 			if (!response.ok) {
 				const errorMessage =
 					data && data.message
@@ -168,7 +145,6 @@
 				return;
 			}
 
-			// Handle Successful Retrieval + AI Answer (AC-5)
 			if (data && data.success) {
 				renderResponse(
 					{
@@ -181,7 +157,6 @@
 					{ responseContainer, thoughtEl, answerTextEl, actionWrapperEl }
 				);
 			} else {
-				// Handle Graceful Fallback / Anti-Hallucination Trigger (AC-6)
 				const fallbackSupportUrl = (data && data.citation) || config.supportUrl || '';
 				renderResponse(
 					{
@@ -197,7 +172,6 @@
 				);
 			}
 		} catch (err) {
-			// Network / Timeout Failure (PRD Section 9: API Timeout / Failure)
 			setLoadingState(false, { input, submitBtn, loadingEl, responseContainer });
 
 			renderResponse(
@@ -213,12 +187,6 @@
 		}
 	});
 
-	/**
-	 * Toggle UI controls during async query processing.
-	 *
-	 * @param {boolean} isLoading Whether a query is currently in-flight.
-	 * @param {Object} elements DOM references.
-	 */
 	function setLoadingState(isLoading, elements) {
 		if (elements.input) {
 			elements.input.disabled = isLoading;
@@ -234,18 +202,11 @@
 		}
 	}
 
-	/**
-	 * Safely populate and expand the response container without innerHTML XSS risks.
-	 *
-	 * @param {Object} payload Data to display.
-	 * @param {Object} elements DOM references.
-	 */
 	function renderResponse(payload, elements) {
 		if (!elements.responseContainer) {
 			return;
 		}
 
-		// 1. "Thought for Xs" indicator (from Acme Hosting HTML design)
 		if (elements.thoughtEl) {
 			if (payload.thoughtText) {
 				elements.thoughtEl.textContent = payload.thoughtText;
@@ -256,12 +217,10 @@
 			}
 		}
 
-		// 2. Answer text (strictly using textContent to prevent XSS)
 		if (elements.answerTextEl) {
 			elements.answerTextEl.textContent = payload.answer || '';
 		}
 
-		// 3. Action Link: Either "Read more →" citation or "Contact Support →" button
 		if (elements.actionWrapperEl) {
 			elements.actionWrapperEl.textContent = '';
 

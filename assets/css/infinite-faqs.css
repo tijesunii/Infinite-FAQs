@@ -1,14 +1,6 @@
 /**
- * Infinite FAQs for WordPress - Frontend Stylesheet
- *
- * Scoped strictly to .infinite-faqs-wrapper to prevent WordPress theme conflicts.
- * Supports both [infinite_faqs_light] (.infinite-faqs-theme-light)
- * and [infinite_faqs_dark] (.infinite-faqs-theme-dark).
+ * Infinite FAQs - Frontend Stylesheet
  */
-
-/* ==========================================================================
-   1. Theme Variables (Light & Dark Mode)
-   ========================================================================== */
 
 .infinite-faqs-wrapper.infinite-faqs-theme-dark {
 	--ifaq-bg-color: #0e0e0e;
@@ -31,10 +23,6 @@
 	--ifaq-surface-bg: #f9f9f9;
 	--ifaq-focus-border: #cccccc;
 }
-
-/* ==========================================================================
-   2. Base Wrapper & Two-Column Layout (Acme Hosting Design)
-   ========================================================================== */
 
 .infinite-faqs-wrapper {
 	box-sizing: border-box;
@@ -62,10 +50,6 @@
 	padding: 48px 24px !important;
 	gap: 24px !important;
 }
-
-/* ==========================================================================
-   3. Left Column: Heading & Subtitle
-   ========================================================================== */
 
 .infinite-faqs-wrapper .infinite-faqs-left-col {
 	flex: 0 0 auto !important;
@@ -107,10 +91,6 @@
 	margin: 0 !important;
 	padding: 0 !important;
 }
-
-/* ==========================================================================
-   4. Right Column: Static FAQ Accordions
-   ========================================================================== */
 
 .infinite-faqs-wrapper .infinite-faqs-right-col {
 	flex: 2 1 0% !important;
@@ -251,10 +231,6 @@
 	line-height: 1.6 !important;
 }
 
-/* ==========================================================================
-   5. Open-Ended AI Input Row & Controls
-   ========================================================================== */
-
 .infinite-faqs-wrapper .infinite-faqs-ask-section {
 	border-bottom: 1px solid var(--ifaq-border-color) !important;
 	width: 100% !important;
@@ -264,6 +240,15 @@
 	margin: 0 !important;
 	padding: 0 !important;
 	width: 100% !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-hp-wrap {
+	position: absolute !important;
+	left: -9999px !important;
+	opacity: 0 !important;
+	height: 0 !important;
+	width: 0 !important;
+	overflow: hidden !important;
 }
 
 .infinite-faqs-wrapper .infinite-faqs-input-wrapper {
@@ -348,12 +333,8 @@
 	cursor: not-allowed !important;
 }
 
-/* ==========================================================================
-   6. Loading State & Dynamic AI Response Block
-   ========================================================================== */
-
 .infinite-faqs-loading {
-	display: flex;
+	display: none;
 	align-items: center;
 	gap: 10px;
 	padding: 0 0 24px 0;
@@ -378,6 +359,7 @@
 }
 
 .infinite-faqs-response-container {
+	display: none;
 	padding: 0 20px 24px 0;
 	font-size: 0.9rem;
 	line-height: 1.6;

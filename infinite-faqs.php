@@ -10,23 +10,18 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly.
+    exit;
 }
 
-// Define plugin constants
 define( 'INFINITE_FAQS_VERSION', '1.0.0' );
 define( 'INFINITE_FAQS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'INFINITE_FAQS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
-/**
- * Activation hook to create the custom database table.
- */
 function infinite_faqs_activate() {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'infinite_faqs_docs';
+    $table_name      = $wpdb->prefix . 'infinite_faqs_docs';
     $charset_collate = $wpdb->get_charset_collate();
 
-    // Data Schema for wp_infinite_faqs_docs
     $sql = "CREATE TABLE $table_name (
         id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         upload_batch_id varchar(100) NOT NULL,
@@ -41,11 +36,8 @@ function infinite_faqs_activate() {
     ) $charset_collate;";
 
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-    
-    // Execute dbDelta to create or update the table safely
     dbDelta( $sql );
 
-    // Register default options if they don't exist
     if ( false === get_option( 'infinite_faqs_support_url' ) ) {
         add_option( 'infinite_faqs_support_url', '' );
     }
@@ -73,9 +65,6 @@ function infinite_faqs_activate() {
 }
 register_activation_hook( __FILE__, 'infinite_faqs_activate' );
 
-/**
- * Default 4 Static FAQ slots (empty by default so placeholders do the work).
- */
 function infinite_faqs_get_default_static_faqs() {
     return array(
         array( 'question' => '', 'answer' => '' ),
@@ -85,41 +74,29 @@ function infinite_faqs_get_default_static_faqs() {
     );
 }
 
-/**
- * Deactivation hook.
- */
 function infinite_faqs_deactivate() {
-    // We do not drop tables on deactivation to preserve data
-    // Flushing rewrite rules if custom endpoints were added
     flush_rewrite_rules();
 }
 register_deactivation_hook( __FILE__, 'infinite_faqs_deactivate' );
 
-/**
- * Core Initialization
- */
-function infinite_faqs_init() {
-    // Load plugin text domain, etc.
-}
-add_action( 'plugins_loaded', 'infinite_faqs_init' );
-
-/**
- * Global Helper Functions
- */
 function infinite_faqs_encrypt_data( $data ) {
-    if ( empty( $data ) ) return $data;
+    if ( empty( $data ) ) {
+        return $data;
+    }
     $encryption_key = defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : 'fallback-ifaq-key-789';
-    $iv_length = openssl_cipher_iv_length( 'aes-256-cbc' );
-    $iv = openssl_random_pseudo_bytes( $iv_length );
-    $encrypted = openssl_encrypt( $data, 'aes-256-cbc', $encryption_key, 0, $iv );
+    $iv_length      = openssl_cipher_iv_length( 'aes-256-cbc' );
+    $iv             = openssl_random_pseudo_bytes( $iv_length );
+    $encrypted      = openssl_encrypt( $data, 'aes-256-cbc', $encryption_key, 0, $iv );
     return base64_encode( $encrypted . '::' . $iv );
 }
 
 function infinite_faqs_decrypt_data( $data ) {
-    if ( empty( $data ) ) return $data;
+    if ( empty( $data ) ) {
+        return $data;
+    }
     $encryption_key = defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : 'fallback-ifaq-key-789';
-    $decoded = base64_decode( $data );
-    if ( strpos( $decoded, '::' ) === false ) {
+    $decoded        = base64_decode( $data );
+    if ( false === strpos( $decoded, '::' ) ) {
         return $data;
     }
     list( $encrypted_data, $iv ) = explode( '::', $decoded, 2 );
@@ -127,17 +104,19 @@ function infinite_faqs_decrypt_data( $data ) {
 }
 
 function infinite_faqs_mask_api_key( $api_key ) {
-    if ( empty( $api_key ) ) return '';
+    if ( empty( $api_key ) ) {
+        return '';
+    }
     $length = strlen( $api_key );
-    if ( $length <= 8 ) return str_repeat( '*', 8 );
+    if ( $length <= 8 ) {
+        return str_repeat( '*', 8 );
+    }
     return substr( $api_key, 0, 4 ) . str_repeat( '*', 8 ) . substr( $api_key, -4 );
 }
 
-// Include REST API & Shortcode
 require_once INFINITE_FAQS_PLUGIN_DIR . 'includes/rest-api.php';
 require_once INFINITE_FAQS_PLUGIN_DIR . 'includes/shortcode.php';
 
-// Include admin files
 if ( is_admin() ) {
     require_once INFINITE_FAQS_PLUGIN_DIR . 'admin/settings-page.php';
     require_once INFINITE_FAQS_PLUGIN_DIR . 'admin/file-uploader.php';
