@@ -23,6 +23,45 @@ function infinite_faqs_add_ingestion_menu() {
 add_action( 'admin_menu', 'infinite_faqs_add_ingestion_menu' );
 
 /**
+ * Enqueue inline admin script for Click-to-Copy shortcode buttons using WordPress enqueue API.
+ *
+ * @param string $hook_suffix Current admin page hook suffix.
+ */
+function infinite_faqs_admin_enqueue_scripts( $hook_suffix ) {
+    if ( false === strpos( $hook_suffix, 'infinite-faqs-ingestion' ) ) {
+        return;
+    }
+
+    wp_register_script( 'infinite-faqs-admin', false, array(), INFINITE_FAQS_VERSION, true );
+    wp_enqueue_script( 'infinite-faqs-admin' );
+
+    $inline_js = "
+    (function() {
+        document.querySelectorAll('.ifaq-copy-shortcode-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var code = btn.getAttribute('data-shortcode');
+                var status = btn.querySelector('.ifaq-copy-status');
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(code).then(function() {
+                        if (status) {
+                            status.textContent = 'Copied!';
+                            status.style.color = '#00a32a';
+                            setTimeout(function() {
+                                status.textContent = 'Copy';
+                                status.style.color = '#2271b1';
+                            }, 2000);
+                        }
+                    });
+                }
+            });
+        });
+    })();
+    ";
+    wp_add_inline_script( 'infinite-faqs-admin', $inline_js );
+}
+add_action( 'admin_enqueue_scripts', 'infinite_faqs_admin_enqueue_scripts' );
+
+/**
  * AI Keyword Generator Helper
  */
 function infinite_faqs_generate_keywords( $chunk_text ) {
@@ -151,8 +190,8 @@ function infinite_faqs_handle_upload() {
         return;
     }
 
-    $file_ext = strtolower( pathinfo( $uploaded_file_name, PATHINFO_EXTENSION ) );
-    if ( 'md' !== $file_ext ) {
+    $filetype = wp_check_filetype( $uploaded_file_name, array( 'md' => 'text/markdown' ) );
+    if ( 'md' !== $filetype['ext'] ) {
         echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'Only .md files are allowed.', 'infinite-faqs' ) . '</p></div>';
         return;
     }
@@ -868,29 +907,6 @@ function infinite_faqs_ingestion_page_html() {
             </form>
         </div>
     </div>
-
-    <script>
-    (function() {
-        document.querySelectorAll('.ifaq-copy-shortcode-btn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                var code = btn.getAttribute('data-shortcode');
-                var status = btn.querySelector('.ifaq-copy-status');
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(code).then(function() {
-                        if (status) {
-                            status.textContent = 'Copied!';
-                            status.style.color = '#00a32a';
-                            setTimeout(function() {
-                                status.textContent = 'Copy';
-                                status.style.color = '#2271b1';
-                            }, 2000);
-                        }
-                    });
-                }
-            });
-        });
-    })();
-    </script>
     <?php
 }
 

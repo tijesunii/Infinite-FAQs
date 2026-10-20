@@ -24,6 +24,39 @@ Instead of relying on third-party SaaS subscriptions or vector databases, Infini
 * **Predefined 4-Card Accordion + AI Auto-Generator:** Manually write your top 4 FAQs or generate them in one click from any indexed `.md` document using AI.
 * **Light & Dark Mode Shortcodes:** Drop `[infinite_faqs_light]` or `[infinite_faqs_dark]` into Gutenberg or Elementor with zero jQuery dependency.
 
+== External Services ==
+
+This plugin connects to external third-party AI APIs **only** when a site administrator explicitly configures an API key in **Infinite FAQs → Settings** and selects one of the supported providers below. No data is transmitted to any external server until an API key is configured.
+
+When configured, data is sent to the selected AI provider under three specific circumstances:
+1. **Markdown Ingestion (Admin):** When an administrator uploads a `.md` file in **Infinite FAQs → Knowledge Base**, the text chunks of that document are sent to the configured AI provider to generate search keywords.
+2. **Predefined FAQ Auto-Generation (Admin):** When an administrator clicks **Generate 4 FAQs with AI**, the selected indexed document chunks are sent to the configured AI provider to generate 4 question-and-answer pairs.
+3. **Visitor Question Answering (Frontend):** When a visitor submits a question in the FAQ search bar and a matching documentation chunk is found in the local WordPress database, the visitor's sanitized question and the matched documentation chunk are sent to the configured AI provider to generate a grounded response.
+
+= Supported Third-Party AI Providers =
+
+* **OpenAI API** (`https://api.openai.com/v1/chat/completions`)
+  * Service Website: [https://openai.com/api/](https://openai.com/api/)
+  * Terms of Use: [https://openai.com/policies/terms-of-use/](https://openai.com/policies/terms-of-use/)
+  * Privacy Policy: [https://openai.com/policies/privacy-policy/](https://openai.com/policies/privacy-policy/)
+* **Anthropic Claude API** (`https://api.anthropic.com/v1/messages`)
+  * Service Website: [https://www.anthropic.com/api](https://www.anthropic.com/api)
+  * Terms of Service: [https://www.anthropic.com/legal/commercial-terms](https://www.anthropic.com/legal/commercial-terms)
+  * Privacy Policy: [https://www.anthropic.com/legal/privacy](https://www.anthropic.com/legal/privacy)
+* **Google Gemini API** (`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`)
+  * Service Website: [https://ai.google.dev/](https://ai.google.dev/)
+  * Terms of Service: [https://ai.google.dev/gemini-api/terms](https://ai.google.dev/gemini-api/terms)
+  * Privacy Policy: [https://policies.google.com/privacy](https://policies.google.com/privacy)
+* **DeepSeek API** (`https://api.deepseek.com/chat/completions`)
+  * Service Website: [https://platform.deepseek.com/](https://platform.deepseek.com/)
+  * Terms of Service: [https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html](https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html)
+  * Privacy Policy: [https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html](https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html)
+
+== Third-Party Libraries & Source Code ==
+
+* **Parsedown** (`v1.8.0` by Emanuil Rusev, bundled in `lib/Parsedown.php` and prefixed as `Infinite_FAQs_Parsedown`): Licensed under the MIT License (GPL-compatible). Source repository: [https://github.com/erusev/parsedown](https://github.com/erusev/parsedown)
+* **Plugin Source Code:** All JavaScript (`assets/js/infinite-faqs.js`) and CSS (`assets/css/infinite-faqs.css`) are shipped in unminified, human-readable form. Public development repository: [https://github.com/tijesunii/Infinite-FAQs](https://github.com/tijesunii/Infinite-FAQs)
+
 == Installation ==
 
 1. Upload the `infinite-faqs` folder to the `/wp-content/plugins/` directory, or install the plugin through the WordPress plugins screen directly.
