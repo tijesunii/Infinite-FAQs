@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Infinite FAQs for WordPress
+ * Plugin Name: Infinite FAQs
  * Plugin URI: https://allmytools.xyz/
- * Description: Infinite FAQs for WordPress using BYOK AI Provider to generate answers securely from your markdown documents without hallucinations.
+ * Description: AI-powered FAQ knowledge base using your own API key (BYOK) to generate accurate answers from your Markdown docs without hallucinations.
  * Version: 1.0.0
  * Author: THEWPBRO
  * License: GPLv2 or later
@@ -61,8 +61,29 @@ function infinite_faqs_activate() {
     if ( false === get_option( 'infinite_faqs_answer_length' ) ) {
         add_option( 'infinite_faqs_answer_length', 'Brief' );
     }
+    if ( false === get_option( 'infinite_faqs_shortcode_heading' ) ) {
+        add_option( 'infinite_faqs_shortcode_heading', 'Questions' );
+    }
+    if ( false === get_option( 'infinite_faqs_shortcode_subtitle' ) ) {
+        add_option( 'infinite_faqs_shortcode_subtitle', 'The short ones are here. For anything else, ask our AI below.' );
+    }
+    if ( false === get_option( 'infinite_faqs_static_faqs' ) ) {
+        add_option( 'infinite_faqs_static_faqs', infinite_faqs_get_default_static_faqs() );
+    }
 }
 register_activation_hook( __FILE__, 'infinite_faqs_activate' );
+
+/**
+ * Default 4 Static FAQ slots (empty by default so placeholders do the work).
+ */
+function infinite_faqs_get_default_static_faqs() {
+    return array(
+        array( 'question' => '', 'answer' => '' ),
+        array( 'question' => '', 'answer' => '' ),
+        array( 'question' => '', 'answer' => '' ),
+        array( 'question' => '', 'answer' => '' ),
+    );
+}
 
 /**
  * Deactivation hook.
@@ -81,6 +102,40 @@ function infinite_faqs_init() {
     // Load plugin text domain, etc.
 }
 add_action( 'plugins_loaded', 'infinite_faqs_init' );
+
+/**
+ * Global Helper Functions
+ */
+function infinite_faqs_encrypt_data( $data ) {
+    if ( empty( $data ) ) return $data;
+    $encryption_key = defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : 'fallback-ifaq-key-789';
+    $iv_length = openssl_cipher_iv_length( 'aes-256-cbc' );
+    $iv = openssl_random_pseudo_bytes( $iv_length );
+    $encrypted = openssl_encrypt( $data, 'aes-256-cbc', $encryption_key, 0, $iv );
+    return base64_encode( $encrypted . '::' . $iv );
+}
+
+function infinite_faqs_decrypt_data( $data ) {
+    if ( empty( $data ) ) return $data;
+    $encryption_key = defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : 'fallback-ifaq-key-789';
+    $decoded = base64_decode( $data );
+    if ( strpos( $decoded, '::' ) === false ) {
+        return $data;
+    }
+    list( $encrypted_data, $iv ) = explode( '::', $decoded, 2 );
+    return openssl_decrypt( $encrypted_data, 'aes-256-cbc', $encryption_key, 0, $iv );
+}
+
+function infinite_faqs_mask_api_key( $api_key ) {
+    if ( empty( $api_key ) ) return '';
+    $length = strlen( $api_key );
+    if ( $length <= 8 ) return str_repeat( '*', 8 );
+    return substr( $api_key, 0, 4 ) . str_repeat( '*', 8 ) . substr( $api_key, -4 );
+}
+
+// Include REST API & Shortcode
+require_once INFINITE_FAQS_PLUGIN_DIR . 'includes/rest-api.php';
+require_once INFINITE_FAQS_PLUGIN_DIR . 'includes/shortcode.php';
 
 // Include admin files
 if ( is_admin() ) {

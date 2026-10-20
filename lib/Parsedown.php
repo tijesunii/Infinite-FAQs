@@ -13,7 +13,7 @@
 #
 #
 
-class Parsedown
+class Infinite_FAQs_Parsedown
 {
     # ~
 

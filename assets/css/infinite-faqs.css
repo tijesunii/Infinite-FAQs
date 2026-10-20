@@ -1,0 +1,428 @@
+/**
+ * Infinite FAQs for WordPress - Frontend Stylesheet
+ *
+ * Scoped strictly to .infinite-faqs-wrapper to prevent WordPress theme conflicts.
+ * Supports both [infinite_faqs_light] (.infinite-faqs-theme-light)
+ * and [infinite_faqs_dark] (.infinite-faqs-theme-dark).
+ */
+
+/* ==========================================================================
+   1. Theme Variables (Light & Dark Mode)
+   ========================================================================== */
+
+.infinite-faqs-wrapper.infinite-faqs-theme-dark {
+	--ifaq-bg-color: #0e0e0e;
+	--ifaq-text-main: #f9f9f9;
+	--ifaq-text-muted: #999999;
+	--ifaq-thought-color: #666666;
+	--ifaq-border-color: #242424;
+	--ifaq-icon-bg: #2a2a2a;
+	--ifaq-surface-bg: #161616;
+	--ifaq-focus-border: #444444;
+}
+
+.infinite-faqs-wrapper.infinite-faqs-theme-light {
+	--ifaq-bg-color: #ffffff;
+	--ifaq-text-main: #111111;
+	--ifaq-text-muted: #666666;
+	--ifaq-thought-color: #888888;
+	--ifaq-border-color: #e5e5e5;
+	--ifaq-icon-bg: #f0f0f0;
+	--ifaq-surface-bg: #f9f9f9;
+	--ifaq-focus-border: #cccccc;
+}
+
+/* ==========================================================================
+   2. Base Wrapper & Two-Column Layout (Acme Hosting Design)
+   ========================================================================== */
+
+.infinite-faqs-wrapper {
+	box-sizing: border-box;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	letter-spacing: -0.01em;
+	background-color: var(--ifaq-bg-color);
+	color: var(--ifaq-text-main);
+	width: 100%;
+	border-radius: 12px;
+	margin: 2rem 0;
+}
+
+.infinite-faqs-wrapper *,
+.infinite-faqs-wrapper *::before,
+.infinite-faqs-wrapper *::after {
+	box-sizing: border-box;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-container {
+	display: flex !important;
+	flex-direction: column !important;
+	width: 100% !important;
+	max-width: 1000px !important;
+	margin: 0 auto !important;
+	padding: 80px 40px !important;
+	gap: 60px !important;
+}
+
+@media (min-width: 768px) {
+	.infinite-faqs-wrapper .infinite-faqs-container {
+		flex-direction: row !important;
+		gap: 120px !important;
+		align-items: flex-start !important;
+	}
+}
+
+/* ==========================================================================
+   3. Left Column: Heading & Subtitle
+   ========================================================================== */
+
+.infinite-faqs-wrapper .infinite-faqs-left-col {
+	flex: 1 1 300px !important;
+	max-width: 300px !important;
+	text-align: left !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-title {
+	font-family: inherit !important;
+	font-size: 2.2rem !important;
+	font-weight: 500 !important;
+	line-height: 1.2 !important;
+	margin: 0 0 16px 0 !important;
+	padding: 0 !important;
+	letter-spacing: -0.02em !important;
+	color: var(--ifaq-text-main) !important;
+	text-transform: none !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-subtitle {
+	font-family: inherit !important;
+	color: var(--ifaq-text-muted) !important;
+	font-size: 0.95rem !important;
+	line-height: 1.5 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+/* ==========================================================================
+   4. Right Column: Static FAQ Accordions
+   ========================================================================== */
+
+.infinite-faqs-wrapper .infinite-faqs-right-col {
+	flex: 2 1 0% !important;
+	display: flex !important;
+	flex-direction: column !important;
+	width: 100% !important;
+	min-width: 0 !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-accordion-list {
+	width: 100% !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-accordion-item {
+	border-bottom: 1px solid var(--ifaq-border-color) !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-accordion-item:first-child {
+	border-top: 1px solid var(--ifaq-border-color) !important;
+}
+
+.infinite-faqs-wrapper button.infinite-faqs-accordion-header {
+	display: flex !important;
+	justify-content: space-between !important;
+	align-items: center !important;
+	padding: 24px 0 !important;
+	margin: 0 !important;
+	cursor: pointer !important;
+	background: transparent !important;
+	background-color: transparent !important;
+	border: none !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	outline: none !important;
+	color: var(--ifaq-text-main) !important;
+	width: 100% !important;
+	text-align: left !important;
+	font-size: 0.95rem !important;
+	font-weight: 400 !important;
+	font-family: inherit !important;
+	line-height: 1.4 !important;
+	text-transform: none !important;
+	letter-spacing: -0.01em !important;
+	min-height: 0 !important;
+}
+
+.infinite-faqs-wrapper button.infinite-faqs-accordion-header:hover,
+.infinite-faqs-wrapper button.infinite-faqs-accordion-header:focus,
+.infinite-faqs-wrapper button.infinite-faqs-accordion-header:active {
+	background: transparent !important;
+	background-color: transparent !important;
+	color: var(--ifaq-text-main) !important;
+	border: none !important;
+	box-shadow: none !important;
+	outline: none !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-question-text {
+	flex: 1 !important;
+	text-align: left !important;
+	color: var(--ifaq-text-main) !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-icon-container {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	width: 32px !important;
+	height: 32px !important;
+	min-width: 32px !important;
+	min-height: 32px !important;
+	border-radius: 50% !important;
+	transition: background-color 0.2s ease !important;
+	margin-left: 16px !important;
+	flex-shrink: 0 !important;
+}
+
+.infinite-faqs-wrapper svg.infinite-faqs-icon {
+	fill: none !important;
+	stroke: var(--ifaq-text-muted) !important;
+	stroke-width: 2 !important;
+	stroke-linecap: round !important;
+	stroke-linejoin: round !important;
+	width: 16px !important;
+	height: 16px !important;
+	min-width: 16px !important;
+	min-height: 16px !important;
+	max-width: 16px !important;
+	max-height: 16px !important;
+	transition: all 0.2s ease !important;
+}
+
+.infinite-faqs-wrapper button.infinite-faqs-accordion-header:hover .infinite-faqs-icon-container,
+.infinite-faqs-wrapper .infinite-faqs-accordion-item.active .infinite-faqs-icon-container {
+	background-color: var(--ifaq-icon-bg) !important;
+}
+
+.infinite-faqs-wrapper button.infinite-faqs-accordion-header:hover svg.infinite-faqs-icon,
+.infinite-faqs-wrapper .infinite-faqs-accordion-item.active svg.infinite-faqs-icon {
+	stroke: var(--ifaq-text-main) !important;
+}
+
+.infinite-faqs-wrapper svg.infinite-faqs-icon-inactive {
+	display: block !important;
+}
+
+.infinite-faqs-wrapper svg.infinite-faqs-icon-active {
+	display: none !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-accordion-item.active svg.infinite-faqs-icon-inactive {
+	display: none !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-accordion-item.active svg.infinite-faqs-icon-active {
+	display: block !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-accordion-content {
+	max-height: 0;
+	overflow: hidden !important;
+	transition: max-height 0.3s ease-out !important;
+	color: var(--ifaq-text-main) !important;
+	font-size: 0.9rem !important;
+	line-height: 1.6 !important;
+	text-align: left !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-accordion-content p {
+	margin: 0 0 24px 0 !important;
+	padding: 0 20px 0 0 !important;
+	color: var(--ifaq-text-main) !important;
+	font-size: 0.9rem !important;
+	line-height: 1.6 !important;
+}
+
+/* ==========================================================================
+   5. Open-Ended AI Input Row & Controls
+   ========================================================================== */
+
+.infinite-faqs-wrapper .infinite-faqs-ask-section {
+	border-bottom: 1px solid var(--ifaq-border-color) !important;
+	width: 100% !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-ask-form {
+	margin: 0 !important;
+	padding: 0 !important;
+	width: 100% !important;
+}
+
+.infinite-faqs-wrapper .infinite-faqs-input-wrapper {
+	display: flex !important;
+	flex-direction: row !important;
+	justify-content: space-between !important;
+	align-items: center !important;
+	padding: 18px 0 !important;
+	width: 100% !important;
+}
+
+.infinite-faqs-wrapper input[type="text"].infinite-faqs-input {
+	flex: 1 1 auto !important;
+	width: auto !important;
+	background: transparent !important;
+	background-color: transparent !important;
+	border: none !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	outline: none !important;
+	color: var(--ifaq-text-main) !important;
+	font-family: inherit !important;
+	font-size: 0.95rem !important;
+	line-height: 1.4 !important;
+	padding: 6px 0 !important;
+	margin: 0 !important;
+	min-height: 0 !important;
+	height: auto !important;
+}
+
+.infinite-faqs-wrapper input[type="text"].infinite-faqs-input::placeholder {
+	color: var(--ifaq-text-muted) !important;
+	opacity: 1 !important;
+}
+
+.infinite-faqs-wrapper input[type="text"].infinite-faqs-input:focus {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	outline: none !important;
+}
+
+.infinite-faqs-wrapper input[type="text"].infinite-faqs-input:disabled {
+	opacity: 0.6 !important;
+	cursor: not-allowed !important;
+}
+
+.infinite-faqs-wrapper button.infinite-faqs-submit-btn {
+	background: transparent !important;
+	background-color: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	cursor: pointer !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	min-height: 0 !important;
+	width: auto !important;
+}
+
+.infinite-faqs-wrapper button.infinite-faqs-submit-btn:hover,
+.infinite-faqs-wrapper button.infinite-faqs-submit-btn:focus {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	outline: none !important;
+}
+
+.infinite-faqs-wrapper button.infinite-faqs-submit-btn .infinite-faqs-icon-container {
+	background-color: var(--ifaq-icon-bg) !important;
+}
+
+.infinite-faqs-wrapper button.infinite-faqs-submit-btn:hover svg.infinite-faqs-icon,
+.infinite-faqs-wrapper button.infinite-faqs-submit-btn:focus svg.infinite-faqs-icon {
+	stroke: var(--ifaq-text-main) !important;
+}
+
+.infinite-faqs-wrapper button.infinite-faqs-submit-btn:disabled {
+	opacity: 0.5 !important;
+	cursor: not-allowed !important;
+}
+
+/* ==========================================================================
+   6. Loading State & Dynamic AI Response Block
+   ========================================================================== */
+
+.infinite-faqs-loading {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 0 0 24px 0;
+	font-size: 0.85rem;
+	color: var(--ifaq-text-muted);
+	font-style: italic;
+}
+
+.infinite-faqs-spinner {
+	width: 14px;
+	height: 14px;
+	border: 2px solid var(--ifaq-border-color);
+	border-top-color: var(--ifaq-text-main);
+	border-radius: 50%;
+	animation: infinite-faqs-spin 0.7s linear infinite;
+}
+
+@keyframes infinite-faqs-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.infinite-faqs-response-container {
+	padding: 0 20px 24px 0;
+	font-size: 0.9rem;
+	line-height: 1.6;
+	color: var(--ifaq-text-main);
+	animation: infinite-faqs-fade-in 0.25s ease-out;
+}
+
+@keyframes infinite-faqs-fade-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.infinite-faqs-ai-thought {
+	font-size: 0.8rem !important;
+	color: var(--ifaq-thought-color) !important;
+	font-style: italic;
+	margin: 0 0 12px 0 !important;
+}
+
+.infinite-faqs-answer-text {
+	margin: 0 0 14px 0;
+	color: var(--ifaq-text-main);
+	white-space: pre-line;
+}
+
+.infinite-faqs-action-wrapper {
+	margin-top: 8px;
+}
+
+.infinite-faqs-citation-link,
+.infinite-faqs-support-link {
+	display: inline-flex;
+	align-items: center;
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: var(--ifaq-text-main) !important;
+	text-decoration: none !important;
+	padding: 6px 14px;
+	border-radius: 999px;
+	background-color: var(--ifaq-icon-bg);
+	transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.infinite-faqs-citation-link:hover,
+.infinite-faqs-support-link:hover {
+	opacity: 0.85;
+	transform: translateX(2px);
+}

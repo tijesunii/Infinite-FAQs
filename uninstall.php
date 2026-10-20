@@ -12,19 +12,23 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 // Check if the admin opted to keep data on uninstall
-$keep_data = get_option( 'infinite_faqs_keep_data_on_uninstall' );
+$infinite_faqs_keep_data = get_option( 'infinite_faqs_keep_data_on_uninstall' );
 
-if ( ! $keep_data || $keep_data === '0' ) {
-    global $wpdb;
+if ( ! $infinite_faqs_keep_data || '0' === $infinite_faqs_keep_data ) {
+	global $wpdb;
 
-    // Drop the custom table
-    $table_name = $wpdb->prefix . 'infinite_faqs_docs';
-    $wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
+	// Drop the custom table
+	$infinite_faqs_table_name = $wpdb->prefix . 'infinite_faqs_docs';
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+	$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $infinite_faqs_table_name ) );
 
-    // Delete options
-    delete_option( 'infinite_faqs_api_key' );
-    delete_option( 'infinite_faqs_support_url' );
-    delete_option( 'infinite_faqs_ai_provider' );
-    delete_option( 'infinite_faqs_answer_length' );
-    delete_option( 'infinite_faqs_keep_data_on_uninstall' );
+	// Delete options
+	delete_option( 'infinite_faqs_api_key' );
+	delete_option( 'infinite_faqs_support_url' );
+	delete_option( 'infinite_faqs_ai_provider' );
+	delete_option( 'infinite_faqs_answer_length' );
+	delete_option( 'infinite_faqs_shortcode_heading' );
+	delete_option( 'infinite_faqs_shortcode_subtitle' );
+	delete_option( 'infinite_faqs_static_faqs' );
+	delete_option( 'infinite_faqs_keep_data_on_uninstall' );
 }

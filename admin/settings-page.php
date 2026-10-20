@@ -24,47 +24,6 @@ function infinite_faqs_add_admin_menu() {
 add_action( 'admin_menu', 'infinite_faqs_add_admin_menu' );
 
 /**
- * Encryption Helper Functions
- * Implements OpenSSL encryption at rest for the API Key.
- */
-function infinite_faqs_encrypt_data( $data ) {
-    if ( empty( $data ) ) return $data;
-    
-    // Use WordPress SECURE_AUTH_KEY if available
-    $encryption_key = defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : 'fallback-ifaq-key-789';
-    $iv_length = openssl_cipher_iv_length( 'aes-256-cbc' );
-    $iv = openssl_random_pseudo_bytes( $iv_length );
-    $encrypted = openssl_encrypt( $data, 'aes-256-cbc', $encryption_key, 0, $iv );
-    
-    return base64_encode( $encrypted . '::' . $iv );
-}
-
-function infinite_faqs_decrypt_data( $data ) {
-    if ( empty( $data ) ) return $data;
-    
-    $encryption_key = defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : 'fallback-ifaq-key-789';
-    $decoded = base64_decode( $data );
-    
-    if ( strpos( $decoded, '::' ) === false ) {
-        return $data; // Return original data if not encrypted with our method
-    }
-    
-    list( $encrypted_data, $iv ) = explode( '::', $decoded, 2 );
-    return openssl_decrypt( $encrypted_data, 'aes-256-cbc', $encryption_key, 0, $iv );
-}
-
-/**
- * Mask API Key for server-side masking in the UI.
- */
-function infinite_faqs_mask_api_key( $api_key ) {
-    if ( empty( $api_key ) ) return '';
-    $length = strlen( $api_key );
-    if ( $length <= 8 ) return str_repeat( '*', 8 );
-    // Show first 4 and last 4 characters, mask the middle
-    return substr( $api_key, 0, 4 ) . str_repeat( '*', 8 ) . substr( $api_key, -4 );
-}
-
-/**
  * Render the Settings Page HTML
  */
 function infinite_faqs_settings_page_html() {
@@ -76,20 +35,23 @@ function infinite_faqs_settings_page_html() {
     // Process form submission
     if ( isset( $_POST['infinite_faqs_submit'] ) ) {
         // Verify nonce
-        if ( ! isset( $_POST['infinite_faqs_settings_nonce'] ) || ! wp_verify_nonce( $_POST['infinite_faqs_settings_nonce'], 'infinite_faqs_save_settings' ) ) {
+        $settings_nonce = isset( $_POST['infinite_faqs_settings_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['infinite_faqs_settings_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $settings_nonce, 'infinite_faqs_save_settings' ) ) {
             wp_die( esc_html__( 'Security check failed.', 'infinite-faqs' ) );
         }
 
         // Save AI Provider
         if ( isset( $_POST['infinite_faqs_ai_provider'] ) ) {
-            update_option( 'infinite_faqs_ai_provider', sanitize_text_field( $_POST['infinite_faqs_ai_provider'] ) );
+            update_option( 'infinite_faqs_ai_provider', sanitize_text_field( wp_unslash( $_POST['infinite_faqs_ai_provider'] ) ) );
         }
 
         // Save API Key (only if it doesn't contain asterisks, indicating it is a new key)
-        if ( ! empty( $_POST['infinite_faqs_api_key'] ) && strpos( $_POST['infinite_faqs_api_key'], '*' ) === false ) {
-            $sanitized_key = sanitize_text_field( wp_unslash( $_POST['infinite_faqs_api_key'] ) );
-            $encrypted_key = infinite_faqs_encrypt_data( $sanitized_key );
-            update_option( 'infinite_faqs_api_key', $encrypted_key );
+        if ( ! empty( $_POST['infinite_faqs_api_key'] ) ) {
+            $raw_api_key = sanitize_text_field( wp_unslash( $_POST['infinite_faqs_api_key'] ) );
+            if ( false === strpos( $raw_api_key, '*' ) ) {
+                $encrypted_key = infinite_faqs_encrypt_data( $raw_api_key );
+                update_option( 'infinite_faqs_api_key', $encrypted_key );
+            }
         }
 
         // Save Support URL
@@ -99,7 +61,7 @@ function infinite_faqs_settings_page_html() {
 
         // Save Answer Length
         if ( isset( $_POST['infinite_faqs_answer_length'] ) ) {
-            update_option( 'infinite_faqs_answer_length', sanitize_text_field( $_POST['infinite_faqs_answer_length'] ) );
+            update_option( 'infinite_faqs_answer_length', sanitize_text_field( wp_unslash( $_POST['infinite_faqs_answer_length'] ) ) );
         }
 
         // Save Keep Data preference
