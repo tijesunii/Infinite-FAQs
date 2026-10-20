@@ -59,16 +59,8 @@
 	width: 100% !important;
 	max-width: 1000px !important;
 	margin: 0 auto !important;
-	padding: 80px 40px !important;
-	gap: 60px !important;
-}
-
-@media (min-width: 768px) {
-	.infinite-faqs-wrapper .infinite-faqs-container {
-		flex-direction: row !important;
-		gap: 120px !important;
-		align-items: flex-start !important;
-	}
+	padding: 48px 24px !important;
+	gap: 24px !important;
 }
 
 /* ==========================================================================
@@ -76,9 +68,23 @@
    ========================================================================== */
 
 .infinite-faqs-wrapper .infinite-faqs-left-col {
-	flex: 1 1 300px !important;
-	max-width: 300px !important;
+	flex: 0 0 auto !important;
+	max-width: 100% !important;
 	text-align: left !important;
+}
+
+@media (min-width: 768px) {
+	.infinite-faqs-wrapper .infinite-faqs-container {
+		flex-direction: row !important;
+		padding: 80px 40px !important;
+		gap: 120px !important;
+		align-items: flex-start !important;
+	}
+
+	.infinite-faqs-wrapper .infinite-faqs-left-col {
+		flex: 1 1 300px !important;
+		max-width: 300px !important;
+	}
 }
 
 .infinite-faqs-wrapper .infinite-faqs-title {
